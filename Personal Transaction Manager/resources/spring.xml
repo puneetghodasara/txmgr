@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context.xsd" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc">
+
+	<!-- General Property Configuration -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>jdbc.properties</value>
+		</property>
+	</bean>
+
+	<!-- Data Source used by Hibernate Session Factory -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- Hibernate Session Factory, using configLocation -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+			</props>
+		</property>
+
+		<!-- Either use packageToScan OR give mapping in XML -->
+		<property name="packagesToScan" value="me.puneetghodasara.txmgr.model" />
+		<!-- <property name="configLocation" value="orm.xml" /> -->
+
+	</bean>
+
+	<!-- Custom Beans -->
+
+	<context:annotation-config />
+	<context:component-scan base-package="me.puneetghodasara" />
+
+	<!-- We use annotation based scan so no need of XML declaration -->
+	<!-- <bean id="transactionRepository" name="transactionRepository" class="integration.TransactionDAO"> 
+		<property name="sessionFactory" ref="sessionFactory"></property> </bean> -->
+</beans>
