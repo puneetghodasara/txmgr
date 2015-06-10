@@ -30,6 +30,10 @@ public class GenericStatementEntry {
 	 * Or statement can have in common filed
 	 */
 	private String absAmount;
+	
+	
+	/* Getter Setter */
+	
 	public String getSrNo() {
 		return srNo;
 	}
@@ -67,6 +71,7 @@ public class GenericStatementEntry {
 		this.absAmount = absAmount;
 	}
 	
+
 	
 	
 }

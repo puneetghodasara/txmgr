@@ -1,47 +1,42 @@
 package me.puneetghodasara.txmgr.model.db;
 
 import java.io.Serializable;
-import javax.persistence.*;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the transaction_detail database table.
  * 
  */
 @Entity
-@Table(name="transaction_detail")
-@NamedQuery(name="TransactionDetail.findAll", query="SELECT t FROM TransactionDetail t")
+@Table(name = "transaction_detail")
+@NamedQuery(name = "TransactionDetail.findAll", query = "SELECT t FROM TransactionDetail t")
 public class TransactionDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
-	private Long id;
+	private Integer id;
 
 	private String category;
 
 	private String tag;
 
-	@Column(name="via_card")
+	private String merchant;
+
+	@Column(name = "via_card")
 	private Boolean viaCard;
 
 	private String way;
 
-	//uni-directional many-to-one association to Account
-	@ManyToOne
-	@JoinColumn(name="target_account")
-	private Account account;
-
 	public TransactionDetail() {
-	}
-
-	public Long getId() {
-		return this.id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getCategory() {
@@ -60,6 +55,14 @@ public class TransactionDetail implements Serializable {
 		this.tag = tag;
 	}
 
+	public String getMerchant() {
+		return merchant;
+	}
+
+	public void setMerchant(String merchant) {
+		this.merchant = merchant;
+	}
+
 	public Boolean getViaCard() {
 		return this.viaCard;
 	}
@@ -76,12 +79,13 @@ public class TransactionDetail implements Serializable {
 		this.way = way;
 	}
 
-	public Account getAccount() {
-		return this.account;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setAccount(Account account) {
-		this.account = account;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
+	
 }

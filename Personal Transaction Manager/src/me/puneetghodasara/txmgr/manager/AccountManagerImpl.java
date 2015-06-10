@@ -2,6 +2,7 @@ package me.puneetghodasara.txmgr.manager;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,8 @@ import me.puneetghodasara.txmgr.model.db.BankEnum;
 @Component(value="accountManager")
 public class AccountManagerImpl implements AccountManager {
 
+	private static final Logger logger = Logger.getLogger(AccountManagerImpl.class);
+	
 	@Autowired
 	private AccountRepository accountRepository; 
 	
@@ -33,6 +36,8 @@ public class AccountManagerImpl implements AccountManager {
 		account.setTag(tag);
 		account.setOpenDate(new Date());
 
+		logger.debug(account);
+		
 		// Persist
 		accountRepository.saveAccount(account);
 		

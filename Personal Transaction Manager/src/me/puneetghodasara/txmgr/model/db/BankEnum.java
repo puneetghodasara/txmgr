@@ -15,8 +15,8 @@ public enum BankEnum {
 	
 	public Bank getBank(){
 		Bank bank = new Bank();
-		bank.setId(id);
-		bank.setBankName(name);
+		bank.setId(this.id);
+		bank.setBankName(this.name);
 		return bank;
 	}
 	

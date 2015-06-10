@@ -1,9 +1,13 @@
 package me.puneetghodasara.txmgr.integration;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import me.puneetghodasara.txmgr.model.db.Account;
 
@@ -18,6 +22,18 @@ public class AccountDAO extends HibernateDaoSupport implements AccountRepository
 	@Override
 	public void saveAccount(Account account) {
 		this.getHibernateTemplate().save(account);
+	}
+
+	@Override
+	public Collection<Account> getAllAccounts() {
+		return this.getHibernateTemplate().loadAll(Account.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Account getAccountByName(String name) {
+		List<Account> accountList = (List<Account>) this.getHibernateTemplate().findByNamedParam(" FROM Account a WHERE a.name =:name", "name", name);
+		return CollectionUtils.isEmpty(accountList)?null:accountList.get(0);
 	}
 
 }
