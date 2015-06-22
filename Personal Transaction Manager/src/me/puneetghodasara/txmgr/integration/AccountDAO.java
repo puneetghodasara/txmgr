@@ -21,7 +21,12 @@ public class AccountDAO extends HibernateDaoSupport implements AccountRepository
 	
 	@Override
 	public void saveAccount(Account account) {
-		this.getHibernateTemplate().save(account);
+		this.getHibernateTemplate().saveOrUpdate(account);
+	}
+
+	@Override
+	public void deleteAccount(Account account) {
+		this.getHibernateTemplate().delete(account);
 	}
 
 	@Override
@@ -34,6 +39,11 @@ public class AccountDAO extends HibernateDaoSupport implements AccountRepository
 	public Account getAccountByName(String name) {
 		List<Account> accountList = (List<Account>) this.getHibernateTemplate().findByNamedParam(" FROM Account a WHERE a.name =:name", "name", name);
 		return CollectionUtils.isEmpty(accountList)?null:accountList.get(0);
+	}
+
+	@Override
+	public void deleteAllAccounts() {
+		this.getHibernateTemplate().deleteAll(getAllAccounts());
 	}
 
 }

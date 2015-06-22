@@ -13,6 +13,8 @@ public interface TransactionRepository {
 
 	void deleteTransaction(Transaction transaction);
 
-	boolean isTransactionSaved(Transaction transaction);
+	Integer isTransactionSaved(Transaction transaction);
+
+	public Transaction getTransactionById(Integer txId);
 	
 }

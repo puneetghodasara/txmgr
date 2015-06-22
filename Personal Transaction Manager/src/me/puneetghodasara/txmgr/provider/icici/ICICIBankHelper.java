@@ -5,14 +5,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.model.db.AccountTypeEnum;
+import me.puneetghodasara.txmgr.model.db.BankEnum;
 import me.puneetghodasara.txmgr.model.input.GenericStatementEntry;
 import me.puneetghodasara.txmgr.model.parser.DateParser;
 import me.puneetghodasara.txmgr.model.parser.StatementParser;
+import me.puneetghodasara.txmgr.provider.TransactionHelper;
 
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBeanFilter;
 import com.opencsv.bean.MappingStrategy;
 
+@Component(value="iciciBankHelper")
+@TransactionHelper(accountType=AccountTypeEnum.BANK_ACCOUNT, bank=BankEnum.ICICI_BANK)
 public class ICICIBankHelper implements StatementParser, DateParser {
 
 	private static CsvToBeanFilter filter = (String[] line) -> {

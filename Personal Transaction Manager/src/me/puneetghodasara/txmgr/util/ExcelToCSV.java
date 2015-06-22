@@ -87,10 +87,10 @@ public class ExcelToCSV {
 	}
 
 	public static void main(String[] args) {
-		File inputFile = new File("C:\\input.xls");
-		File outputFile = new File("C:\\output1.csv");
-		File inputFile2 = new File("C:\\input.xlsx");
-		File outputFile2 = new File("C:\\output2.csv");
+		File inputFile = new File("statement\\ICICI.xls");
+		File outputFile = new File("statement\\ICICI.csv");
+//		File inputFile2 = new File("C:\\input.xlsx");
+//		File outputFile2 = new File("C:\\output2.csv");
 		convertToXls(inputFile, outputFile);
 //		convertToXlsx(inputFile2, outputFile2);
 	}

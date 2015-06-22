@@ -28,11 +28,11 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanFilter;
 import com.opencsv.bean.MappingStrategy;
 
-@Component(value="statementManager")
+@Component(value = "statementManager")
 public class GenericStatementManager implements StatementManager {
 
 	@Autowired
-	@Qualifier(value="excel2csv")
+	@Qualifier(value = "excel2csv")
 	private ExcelToCSV excelToCsv;
 
 	@SuppressWarnings("rawtypes")
@@ -43,7 +43,7 @@ public class GenericStatementManager implements StatementManager {
 
 	@Autowired
 	private TransactionParser transactionParser;
-	
+
 	private static Logger logger = Logger.getLogger(GenericStatementManager.class);
 
 	@Override
@@ -57,13 +57,13 @@ public class GenericStatementManager implements StatementManager {
 			throw new FileNotFoundException(statementFileName);
 		}
 		logger.debug("validated.");
-		
+
 		// Convert to CSV
 		File tempCsvFile = new File(statementFileName + ".csv");
 		tempCsvFile.createNewFile();
 		ExcelToCSV.convertToXls(statementFile, tempCsvFile);
 		logger.debug("converted to csv.");
-		
+
 		// Get the statement parser
 		StatementParser statementParser = Factory.getStatementParser(account);
 		if (statementParser == null) {
@@ -72,7 +72,7 @@ public class GenericStatementManager implements StatementManager {
 		}
 
 		// Get filter and strategy
-		CSVReader csvReader = new CSVReader(new FileReader(tempCsvFile),',','\"');
+		CSVReader csvReader = new CSVReader(new FileReader(tempCsvFile), ',', '\"');
 		CsvToBeanFilter filter = statementParser.getCsvToBeanFilter();
 		MappingStrategy<GenericStatementEntry> strategy = statementParser.getCsvMappingStrategy();
 
@@ -82,11 +82,11 @@ public class GenericStatementManager implements StatementManager {
 		try {
 			statementEntryList = csvToBean.parse(strategy, csvReader, filter);
 		} catch (Exception e) {
-			logger.error("Parsing error :"+e);
+			logger.error("Parsing error :" + e);
 			throw new CustomException(ExceptionType.CSV_PARSE_EXCEPTION);
 		}
-		logger.debug("Listed statement entries "+statementEntryList.size());
-		
+		logger.debug("Listed statement entries " + statementEntryList.size());
+
 		// Get the entry parser
 		DateParser dateParser = Factory.getDateParser(account);
 		if (dateParser == null) {
@@ -97,16 +97,29 @@ public class GenericStatementManager implements StatementManager {
 		EntryParserUtil entryParser = new EntryParserUtil(dateParser);
 		List<Transaction> transactionEntryList = entryParser.convertEntries(account, statementEntryList);
 		logger.debug("Listed tx entries.");
-		
+
 		// Store the tx entries
-		transactionEntryList.forEach(tx->{
-			if(!transactionRepository.isTransactionSaved(tx) || tx.getTransactionDetail()==null){
-				transactionParser.parseTransaction(tx);				
-				transactionRepository.saveTransaction(tx);	
+		transactionEntryList.forEach(tx -> {
+			Integer txId = transactionRepository.isTransactionSaved(tx);
+			if (txId == null) {
+				// New Tx
+				transactionParser.parseTransaction(tx);
+				transactionRepository.saveTransaction(tx);
+			} else {
+				Transaction originalTx = transactionRepository.getTransactionById(txId);
+				if(originalTx.getTransactionDetail() == null){
+					// Unprocessed old
+					transactionParser.parseTransaction(originalTx);
+					transactionRepository.saveTransaction(originalTx);
+				}
 			}
 		});
 
-		logger.debug("Returning statement entries list size "+transactionEntryList.size());
+		// Delete tempCsv
+		if (tempCsvFile.exists())
+			tempCsvFile.delete();
+
+		logger.debug("Returning statement entries list size " + transactionEntryList.size());
 		return true;
 	}
 

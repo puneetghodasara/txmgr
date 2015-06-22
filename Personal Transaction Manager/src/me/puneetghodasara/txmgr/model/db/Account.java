@@ -24,11 +24,11 @@ public class Account implements Serializable {
 	@Column(name = "name")
 	private String name;
 
-	@OneToOne(cascade=CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "bank_name")
 	private Bank bank;
 
-	@OneToOne(cascade=CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "type")
 	private AccountType accountType;
 
@@ -40,7 +40,7 @@ public class Account implements Serializable {
 	private String tag;
 
 
-	@OneToMany(mappedBy = "account")
+	@OneToMany(mappedBy = "account", cascade=CascadeType.ALL)
 	private List<Transaction> transactions;
 
 	public Account() {

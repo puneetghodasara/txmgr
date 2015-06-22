@@ -9,6 +9,7 @@ import me.puneetghodasara.txmgr.model.db.Transaction;
 import me.puneetghodasara.txmgr.model.db.TransactionDetail;
 import me.puneetghodasara.txmgr.util.UnmatchedTransactionWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,12 @@ public class GenericTransactionParser implements TransactionParser {
 		logger.debug("Parsing Transaction " + transaction);
 
 		final String txDesc = transaction.getDescription();
+		
 		Rule matchedRule = null;
 
 		List<Rule> matchedRuleList = ruleRepository.getAllRules()
 				.stream()
-				.filter(rule -> (txDesc.contains(rule.getRule())))
+				.filter(rule -> (StringUtils.containsIgnoreCase(txDesc,rule.getRule())))
 				.collect(Collectors.toList());
 
 		if(matchedRuleList.size()==1){

@@ -2,14 +2,9 @@ package me.puneetghodasara.txmgr.provider.citi;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import main.Main;
-import me.puneetghodasara.txmgr.exception.CustomException;
-import me.puneetghodasara.txmgr.exception.CustomException.ExceptionType;
-import me.puneetghodasara.txmgr.exception.MessageException;
 import me.puneetghodasara.txmgr.manager.AccountManager;
 import me.puneetghodasara.txmgr.manager.AccountManagerImpl;
 import me.puneetghodasara.txmgr.model.db.Account;
@@ -19,12 +14,14 @@ import me.puneetghodasara.txmgr.model.db.Transaction;
 import me.puneetghodasara.txmgr.model.input.GenericStatementEntry;
 import me.puneetghodasara.txmgr.model.parser.DateParser;
 import me.puneetghodasara.txmgr.model.parser.StatementParser;
+import me.puneetghodasara.txmgr.provider.TransactionHelper;
 import me.puneetghodasara.txmgr.util.EntryParserUtil;
 import me.puneetghodasara.txmgr.util.ExcelToCSV;
 import me.puneetghodasara.txmgr.util.Factory;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
@@ -32,6 +29,8 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanFilter;
 import com.opencsv.bean.MappingStrategy;
 
+@Component(value="citiBankHelper")
+@TransactionHelper(accountType=AccountTypeEnum.BANK_ACCOUNT, bank=BankEnum.CITI_BANK)
 public class CITIBankHelper implements StatementParser, DateParser {
 
 	private static CsvToBeanFilter filter = (String[] line) -> {
@@ -112,7 +111,7 @@ public class CITIBankHelper implements StatementParser, DateParser {
 		AccountManager accountManager = new AccountManagerImpl();
 		Account account = new Account();
 		account.setName("CITI-Test");
-		account.setBank(BankEnum.ICICI.getBank());
+		account.setBank(BankEnum.CITI_BANK.getBank());
 		account.setAccountType(AccountTypeEnum.BANK_ACCOUNT.getAccountType());
 		account.setTag("Test-Tag");
 		account.setOpenDate(new Date());

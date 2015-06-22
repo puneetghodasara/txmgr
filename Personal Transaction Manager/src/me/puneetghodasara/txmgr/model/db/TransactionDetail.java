@@ -8,7 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 /**
  * The persistent class for the transaction_detail database table.
@@ -21,9 +26,13 @@ public class TransactionDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
 	private Integer id;
+	
+//	@OneToOne
+//	@PrimaryKeyJoinColumn
+//	private Transaction transaction;
 
 	private String category;
 
@@ -36,6 +45,10 @@ public class TransactionDetail implements Serializable {
 
 	private String way;
 
+//	@OneToOne
+//	@PrimaryKeyJoinColumn
+//	private Transaction transaction;
+	
 	public TransactionDetail() {
 	}
 
@@ -86,6 +99,8 @@ public class TransactionDetail implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+
 
 	
 }

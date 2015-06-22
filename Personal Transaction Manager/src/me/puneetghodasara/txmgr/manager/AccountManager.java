@@ -12,5 +12,7 @@ public interface AccountManager {
 	public Account getAccountById(String id);
 
 	public Account createAccount(String name, BankEnum bank, AccountTypeEnum accType, String tag) throws DuplicateException;
+
+	public void deleteAccount(Account citiCardAcc);
 	
 }

@@ -45,9 +45,14 @@ public class AccountManagerImpl implements AccountManager {
 	}
 
 	@Override
+	public void deleteAccount(Account citiCardAcc) {
+		accountRepository.deleteAccount(citiCardAcc);
+	}
+
+	
+	@Override
 	public Account getAccountByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return accountRepository.getAccountByName(name);
 	}
 
 	@Override

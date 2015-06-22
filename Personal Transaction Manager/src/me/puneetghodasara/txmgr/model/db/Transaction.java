@@ -53,7 +53,7 @@ public class Transaction implements Serializable {
 
 	// uni-directional one-to-one association to TransactionDetail
 	@OneToOne(cascade=CascadeType.ALL)
-	@JoinColumn(name="id")
+	@JoinColumn(name="detail_id", referencedColumnName="id")
 	private TransactionDetail transactionDetail;
 
 	public Transaction() {
@@ -125,7 +125,11 @@ public class Transaction implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((account == null) ? 0 : account.hashCode());
+		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+		result = prime * result + ((creditDebit == null) ? 0 : creditDebit.hashCode());
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		return result;
 	}
 
@@ -138,14 +142,32 @@ public class Transaction implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Transaction other = (Transaction) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (account == null) {
+			if (other.account != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!account.equals(other.account))
+			return false;
+		if (amount == null) {
+			if (other.amount != null)
+				return false;
+		} else if (!amount.equals(other.amount))
+			return false;
+		if (creditDebit != other.creditDebit)
+			return false;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
 			return false;
 		return true;
 	}
-	
+
+
 
 	
 
