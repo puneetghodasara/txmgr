@@ -103,13 +103,13 @@ public class GenericStatementManager implements StatementManager {
 			Integer txId = transactionRepository.isTransactionSaved(tx);
 			if (txId == null) {
 				// New Tx
-				transactionParser.parseTransaction(tx);
+				transactionParser.parseTransaction(account, tx);
 				transactionRepository.saveTransaction(tx);
 			} else {
 				Transaction originalTx = transactionRepository.getTransactionById(txId);
 				if(originalTx.getTransactionDetail() == null){
 					// Unprocessed old
-					transactionParser.parseTransaction(originalTx);
+					transactionParser.parseTransaction(account, originalTx);
 					transactionRepository.saveTransaction(originalTx);
 				}
 			}

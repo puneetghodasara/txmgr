@@ -26,7 +26,7 @@ public class Main {
 
 	private static final Logger logger = Logger.getLogger(Main.class);
 
-	public static final ApplicationContext appContext = new ClassPathXmlApplicationContext("spring.xml");
+	public static ApplicationContext appContext = new ClassPathXmlApplicationContext("spring.xml");
 
 	static{
 		try {

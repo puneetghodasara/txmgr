@@ -18,11 +18,11 @@ import org.apache.log4j.Logger;
 public class EntryParserUtil {
 
 	private DateParser dateParser;
-	
+
 	public EntryParserUtil(DateParser dateParser) {
 		this.dateParser = dateParser;
 	}
-	
+
 	static final Logger logger = Logger.getLogger(EntryParserUtil.class);
 
 	public List<Transaction> convertEntries(Account account, List<GenericStatementEntry> statementEntryList) throws MessageException {
@@ -34,19 +34,18 @@ public class EntryParserUtil {
 		List<String> errorEntryList = new ArrayList<String>();
 
 		// Convert Each and add to return list or error list
-		statementEntryList.forEach(stmtEntry->{
+		statementEntryList.forEach(stmtEntry -> {
 			try {
-				txList.add(getTransactionEntry(account,stmtEntry));
+				txList.add(getTransactionEntry(account, stmtEntry));
 			} catch (Exception e) {
 				String srNo = stmtEntry.getSrNo();
 				logger.error("Statement Entry no " + srNo + " for " + account + " can not be converted to transaction. Reason :" + e.getMessage());
 				errorEntryList.add(srNo);
 			}
 		});
-		
+
 		if (errorEntryList.size() > 0) {
-			String message = "Following Statement Entries are invalid :\n"
-					+ errorEntryList;
+			String message = "Following Statement Entries are invalid :\n" + errorEntryList;
 			throw new MessageException(message);
 		}
 
@@ -55,6 +54,7 @@ public class EntryParserUtil {
 
 	/**
 	 * Converts StatementEntry to Transaction
+	 * 
 	 * @param account
 	 * @param statementEntry
 	 * @return
@@ -72,19 +72,29 @@ public class EntryParserUtil {
 			String credit = statementEntry.getCredit().replaceAll("[^0-9.]", "");
 			String debit = statementEntry.getDebit().replaceAll("[^0-9.]", "");
 
+			Double crAmount = null;
+			Double drAmount = null;
 			try {
-				amount = Double.parseDouble(credit);
-				creditDebit = CreditDebitEnum.CREDIT;
+				crAmount = Double.parseDouble(credit);
 			} catch (NumberFormatException nfe) {
 			}
 			try {
-				amount = Double.parseDouble(debit);
-				creditDebit = CreditDebitEnum.DEBIT;
+				drAmount = Double.parseDouble(debit);
 			} catch (NumberFormatException nfe) {
 			}
-			if (amount == null) {
+			if ((crAmount == null && drAmount == null) || (crAmount != null && crAmount.doubleValue() == 0 && drAmount != null && drAmount == 0)) {
 				logger.error("Number Format Exception for :" + credit + " / " + debit);
 				throw new CustomException(ExceptionType.CREDIT_DEBIT_PARSE_ERROR);
+			}
+			if (crAmount == null || crAmount.doubleValue() == 0) {
+				amount = drAmount;
+				creditDebit = CreditDebitEnum.DEBIT;
+			} else if (drAmount == null || drAmount.doubleValue() == 0) {
+				amount = crAmount;
+				creditDebit = CreditDebitEnum.CREDIT;
+			} else {
+				amount = crAmount;
+				creditDebit = CreditDebitEnum.CREDIT;
 			}
 		} else {
 			String absAmount = statementEntry.getAbsAmount().replaceAll("[^0-9.-]", "");

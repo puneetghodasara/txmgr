@@ -12,6 +12,8 @@ public interface AccountRepository {
 	public Collection<Account> getAllAccounts();
 	
 	public Account getAccountByName(String name);
+	
+	public Account getAccountByNumber(String number);
 
 	public void deleteAccount(Account account);
 	

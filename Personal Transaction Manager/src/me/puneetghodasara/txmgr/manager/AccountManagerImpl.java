@@ -21,16 +21,17 @@ public class AccountManagerImpl implements AccountManager {
 	private AccountRepository accountRepository; 
 	
 	@Override
-	public Account createAccount(String name, BankEnum bank,
+	public Account createAccount(String name, String number, BankEnum bank,
 			AccountTypeEnum accType, String tag) throws DuplicateException{
 
 		// Check
-		if(getAccountByName(name)!=null)
-			throw new DuplicateException(name);
+//		if(getAccountByName(name)!=null)
+//			throw new DuplicateException(name);
 		
 		// Make an Account
 		Account account = new Account();
 		account.setName(name);
+		account.setAccountNumber(number);
 		account.setBank(bank.getBank());
 		account.setAccountType(accType.getAccountType());
 		account.setTag(tag);
@@ -55,6 +56,12 @@ public class AccountManagerImpl implements AccountManager {
 		return accountRepository.getAccountByName(name);
 	}
 
+	@Override
+	public Account getAccountByNumber(String number) {
+		return accountRepository.getAccountByNumber(number);
+	}
+
+	
 	@Override
 	public Account getAccountById(String id) {
 		// TODO Auto-generated method stub

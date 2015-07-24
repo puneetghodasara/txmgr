@@ -2,15 +2,19 @@ package me.puneetghodasara.txmgr.model.db;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -45,10 +49,21 @@ public class TransactionDetail implements Serializable {
 
 	private String way;
 
-//	@OneToOne
-//	@PrimaryKeyJoinColumn
-//	private Transaction transaction;
+	@Transient
+	private boolean isTransfer = false;
+
+	@OneToOne
+	@JoinColumn(name="target_account", referencedColumnName="id")
+	private Account targetAccount;
 	
+	public Account getTargetAccount() {
+		return targetAccount;
+	}
+
+	public void setTargetAccount(Account targetAccount) {
+		this.targetAccount = targetAccount;
+	}
+
 	public TransactionDetail() {
 	}
 
@@ -100,7 +115,13 @@ public class TransactionDetail implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		return "TransactionDetail [category=" + category + ", tag=" + tag + ", merchant=" + merchant + ", targetAccount=" + targetAccount + "]";
+	}
 
 
+
+	
 	
 }

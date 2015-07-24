@@ -23,6 +23,9 @@ public class Account implements Serializable {
 
 	@Column(name = "name")
 	private String name;
+	
+	@Column(name = "account_no")
+	private String accountNumber;
 
 	@OneToOne
 	@JoinColumn(name = "bank_name")
@@ -68,6 +71,14 @@ public class Account implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
 	}
 
 	public Date getOpenDate() {

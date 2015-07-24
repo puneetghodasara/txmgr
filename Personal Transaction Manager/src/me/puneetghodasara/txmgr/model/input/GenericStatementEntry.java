@@ -70,8 +70,14 @@ public class GenericStatementEntry {
 	public void setAbsAmount(String absAmount) {
 		this.absAmount = absAmount;
 	}
+	@Override
+	public String toString() {
+		return "GenericStatementEntry [srNo=" + srNo + ", date=" + date + ", description=" + description + ", credit=" + credit + ", debit=" + debit
+				+ ", absAmount=" + absAmount + "]";
+	}
 	
 
+	
 	
 	
 }

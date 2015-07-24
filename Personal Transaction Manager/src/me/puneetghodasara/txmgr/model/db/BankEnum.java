@@ -5,7 +5,9 @@ public enum BankEnum {
 	ICICI_BANK(1,"ICICI Bank Saving Account"),
 	CITI_CC_VISA_REWARDS(2,"Citi Visa Rewards"),
 	CITI_CC_MC_FUEL(3,"Citi Master Card Indian Oil"),
-	CITI_BANK(4,"Citi Bank Saving Account");
+	CITI_BANK(4,"Citi Bank Saving Account"),
+	UNKNOWN_BANK(6,"Unknown Bank Type"),
+	NO_BANK(5,"--");
 	
 	public Integer id;
 	private String name;

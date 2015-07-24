@@ -40,6 +40,13 @@ public class AccountDAO extends HibernateDaoSupport implements AccountRepository
 		List<Account> accountList = (List<Account>) this.getHibernateTemplate().findByNamedParam(" FROM Account a WHERE a.name =:name", "name", name);
 		return CollectionUtils.isEmpty(accountList)?null:accountList.get(0);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Account getAccountByNumber(String number) {
+		List<Account> accountList = (List<Account>) this.getHibernateTemplate().findByNamedParam(" FROM Account a WHERE a.accountNumber =:number", "number", number);
+		return CollectionUtils.isEmpty(accountList)?null:accountList.get(0);
+	}
 
 	@Override
 	public void deleteAllAccounts() {

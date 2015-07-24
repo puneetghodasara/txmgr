@@ -32,7 +32,7 @@ public class CSVRuleReader {
 		}
 		
 		ColumnPositionMappingStrategy<Rule> mapper = new ColumnPositionMappingStrategy<Rule>();
-		mapper.setColumnMapping("rule","category","merchant");
+		mapper.setColumnMapping("rule","category","merchant","targetAccount","propRef");
 		mapper.setType(Rule.class);
 		
 		List<Rule> ruleList = csvToBean.parse(mapper, reader);
@@ -40,5 +40,6 @@ public class CSVRuleReader {
 		logger.info("Rules found :"+ruleList.size());
 		return ruleList;
 	}
-	
+
+
 }

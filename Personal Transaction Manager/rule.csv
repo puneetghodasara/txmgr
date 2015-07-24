@@ -1,0 +1,19 @@
+PayTM,Recharge,PayTM
+Pisces eser,Food,FoodPanda
+FACEBOOK,Misc,Facebook
+ACCELYST,Recharge,Freecharge
+irctc.co.in,Travelling,IRCTC
+FREECHARGE,Recharge,Freecharge
+FAASOS,Food,Faasos
+SMSChgs,BankCharge,ICICI
+ATM/CASH,Withdrawal,Self,Self
+IWISH,Saving,ICICI,ICICI-IWISH
+DCARDFEE,BankCharge,ICICI
+Int.Pd,Interest,ICICI
+Interest Earned,Interest,CITI
+ATM WITHDRAWAL,Withdrawal,Self,Self
+RELIANCE FRESH,Grocery,R-Fresh
+IMPS OUTWARD,Transfer,Transfer,Other,IMPS_OUTWARD
+NEFT INWARD,Transfer,Transfer,Other,NEFT_INWARD
+Payment for Credit Card No,Bill Pay,CREDIT_CARD,Other,CREDIT_CARD_PAYMENT
+SALARY CREDIT,Salary,SOURCE_ACCOUNT,Other,SALARY_CREDIT

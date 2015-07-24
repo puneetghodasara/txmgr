@@ -1,7 +1,10 @@
 package main;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import me.puneetghodasara.txmgr.model.db.AccountTypeEnum;
 import me.puneetghodasara.txmgr.model.db.BankEnum;
@@ -9,57 +12,71 @@ import me.puneetghodasara.txmgr.provider.TransactionHelper;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Setup Class that will be called when the bean initializing happens.
+ * 
  * @author Punit_Ghodasara
  *
  */
 public class SetupUtil {
 
 	// To store all registered helper bean
-	private static Map<HelperMap,String> helperBeanMap = new HashMap<SetupUtil.HelperMap, String>();
+	private static Map<HelperMap, String> helperBeanMap = new HashMap<SetupUtil.HelperMap, String>();
+
+	// To store all properties
+	private static Properties prop = new Properties();
 	
 	// Logger
 	private static final Logger logger = Logger.getLogger(SetupUtil.class);
-	
-	
+
 	/**
 	 * Gives the bean name type account of bank
+	 * 
 	 * @param accountTypeEnum
 	 * @param bankEnum
 	 * @return
 	 */
-	public static String getHelperBeanName(AccountTypeEnum accountTypeEnum, BankEnum bankEnum){
+	public static String getHelperBeanName(AccountTypeEnum accountTypeEnum, BankEnum bankEnum) {
 		return helperBeanMap.get(new HelperMap(accountTypeEnum, bankEnum));
+	}
+
+	public static Properties getProp() {
+		return prop;
 	}
 
 	public static void setup(ApplicationContext appContext) throws Exception {
 
 		Map<String, Object> helperMap = appContext.getBeansWithAnnotation(TransactionHelper.class);
-		for(Object helper : helperMap.values()){
+		for (Object helper : helperMap.values()) {
 			final Class<? extends Object> helperClass = helper.getClass();
 			final TransactionHelper annotation = helperClass.getAnnotation(TransactionHelper.class);
-			logger.info("Found Helper class: " + helperClass + ", for bank: " + annotation.bank() + ", for type: "+annotation.accountType());
+			logger.info("Found Helper class: " + helperClass + ", for bank: " + annotation.bank() + ", for type: " + annotation.accountType());
 			String[] beanNames = appContext.getBeanNamesForType(helperClass);
-			if(beanNames.length > 0){
+			if (beanNames.length > 0) {
 				helperBeanMap.put(new HelperMap(annotation.accountType(), annotation.bank()), beanNames[0]);
 			}
-		}		
-		
+		}
+
+		// Get All Properties
+		try (FileInputStream propFile = new FileInputStream(new File("transfer.csv.prop"))) {
+			prop.load(propFile);
+		} catch(Exception e){
+			// Suppress
+		}
+
 	}
-	
-	
+
 	/**
 	 * A key class to store all helper beans
+	 * 
 	 * @author Punit_Ghodasara
 	 *
 	 */
-	private static class HelperMap{
+	private static class HelperMap {
 		private AccountTypeEnum accountTypeEnum;
 		private BankEnum bankEnum;
-		
+
 		public HelperMap(AccountTypeEnum accountTypeEnum, BankEnum bankEnum) {
 			super();
 			this.accountTypeEnum = accountTypeEnum;
@@ -92,8 +109,5 @@ public class SetupUtil {
 		}
 
 	}
-
-
-
 
 }
