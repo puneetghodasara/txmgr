@@ -5,19 +5,18 @@ import java.io.FileReader;
 import java.util.Date;
 import java.util.List;
 
-import me.puneetghodasara.txmgr.manager.AccountManager;
-import me.puneetghodasara.txmgr.manager.AccountManagerImpl;
-import me.puneetghodasara.txmgr.model.db.Account;
-import me.puneetghodasara.txmgr.model.db.AccountTypeEnum;
-import me.puneetghodasara.txmgr.model.db.BankEnum;
-import me.puneetghodasara.txmgr.model.db.Transaction;
-import me.puneetghodasara.txmgr.model.input.GenericStatementEntry;
-import me.puneetghodasara.txmgr.model.parser.DateParser;
-import me.puneetghodasara.txmgr.model.parser.StatementParser;
-import me.puneetghodasara.txmgr.provider.TransactionHelper;
-import me.puneetghodasara.txmgr.util.EntryParserUtil;
-import me.puneetghodasara.txmgr.util.ExcelToCSV;
-import me.puneetghodasara.txmgr.util.Factory;
+import me.puneetghodasara.txmgr.core.manager.AccountManager;
+import me.puneetghodasara.txmgr.core.manager.impl.AccountManagerImpl;
+import me.puneetghodasara.txmgr.core.model.db.Account;
+import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
+import me.puneetghodasara.txmgr.core.model.db.BankEnum;
+import me.puneetghodasara.txmgr.core.model.db.Transaction;
+import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
+import me.puneetghodasara.txmgr.core.parser.CSVRecordParser;
+import me.puneetghodasara.txmgr.core.parser.DateParser;
+import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
+import me.puneetghodasara.txmgr.core.util.ExcelToCSV;
+import me.puneetghodasara.txmgr.core.util.Factory;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -31,13 +30,12 @@ import com.opencsv.bean.MappingStrategy;
 
 @Component(value="citiCardHelper")
 @TransactionHelper(accountType=AccountTypeEnum.CREDIT_CARD,bank=BankEnum.CITI_CC_VISA_REWARDS)
-public class CITICardHelper implements StatementParser, DateParser {
+public class CITICardHelper implements CSVRecordParser, DateParser {
 
 	private static CsvToBeanFilter filter = (String[] line) -> {
 		try {
 			Double.parseDouble(line[0]);
 		} catch (NumberFormatException nfe) {
-			System.out.println("Ignoring "+line[0] +":"+nfe.getMessage());
 			return false;
 		}
 		return true;
@@ -79,57 +77,4 @@ public class CITICardHelper implements StatementParser, DateParser {
 	}
 	
 	
-	public static void main(String[] args) throws Exception{
-
-		Logger logger = Logger.getLogger(CITICardHelper.class);
-		
-		CITICardHelper citiBankHelper = new CITICardHelper();
-		
-		String statementFileName = "CITI-CC-04-2015.xls";
-		File statementFile = new File(statementFileName);
-		File tempCsvFile = new File(statementFileName  + ".csv");
-		tempCsvFile.createNewFile();
-		ExcelToCSV.convertToXls(statementFile, tempCsvFile);
-		
-		
-		CSVReader csvReader = new CSVReader(new FileReader(tempCsvFile),',','\"');
-		CsvToBeanFilter filter = citiBankHelper.getCsvToBeanFilter();
-		MappingStrategy<GenericStatementEntry> strategy = citiBankHelper.getCsvMappingStrategy();
-
-		logger.debug("start of parsing.");
-		// Parse
-		List<GenericStatementEntry> statementEntryList = null;
-		try {
-			CsvToBean csvToBean = new CsvToBean();
-			statementEntryList = csvToBean.parse(strategy, csvReader, filter);
-		} catch (Exception e) {
-			logger.error("Parsing error :"+e);
-		}
-		logger.debug("Listed statement entries "+statementEntryList.size());
-
-		EntryParserUtil entryParser = new EntryParserUtil(new CITICardHelper());
-		AccountManager accountManager = new AccountManagerImpl();
-		Account account = new Account();
-		account.setName("CITI-Test");
-		account.setBank(BankEnum.CITI_CC_VISA_REWARDS.getBank());
-		account.setAccountType(AccountTypeEnum.BANK_ACCOUNT.getAccountType());
-		account.setTag("Test-Tag");
-		account.setOpenDate(new Date());
-
-		// Get the entry parser
-		DateParser dateParser = Factory.getDateParser(account);
-		if (dateParser == null) {
-			logger.error("No valid date parser found from factory for " + account);
-		}
-
-		List<Transaction> transactionEntryList = entryParser.convertEntries(account, statementEntryList);
-		logger.debug("Listed tx entries.");
-
-		transactionEntryList.forEach(tx->{
-			logger.info(tx);
-		});
-
-	
-	}
-
 }

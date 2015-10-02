@@ -5,19 +5,22 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import me.puneetghodasara.txmgr.exception.CustomException;
-import me.puneetghodasara.txmgr.exception.CustomException.ExceptionType;
-import me.puneetghodasara.txmgr.integration.AccountRepository;
-import me.puneetghodasara.txmgr.integration.RuleRepository;
-import me.puneetghodasara.txmgr.integration.TransactionRepository;
-import me.puneetghodasara.txmgr.manager.AccountManager;
-import me.puneetghodasara.txmgr.manager.StatementManager;
-import me.puneetghodasara.txmgr.model.db.Account;
-import me.puneetghodasara.txmgr.model.db.Rule;
-import me.puneetghodasara.txmgr.util.CSVRuleReader;
+import me.puneetghodasara.txmgr.core.engine.InputEngine;
+import me.puneetghodasara.txmgr.core.engine.StatementEngine;
+import me.puneetghodasara.txmgr.core.exception.CustomException;
+import me.puneetghodasara.txmgr.core.exception.CustomException.ExceptionType;
+import me.puneetghodasara.txmgr.core.integration.RuleRepository;
+import me.puneetghodasara.txmgr.core.manager.AccountManager;
+import me.puneetghodasara.txmgr.core.model.db.Account;
+import me.puneetghodasara.txmgr.core.model.db.Rule;
+import me.puneetghodasara.txmgr.core.model.db.Statement;
+import me.puneetghodasara.txmgr.core.parser.RuleParser;
+import me.puneetghodasara.txmgr.core.util.DefaultEntries;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -28,40 +31,66 @@ public class Main {
 
 	public static ApplicationContext appContext = new ClassPathXmlApplicationContext("spring.xml");
 
-	static{
-		try {
-			SetupUtil.setup(appContext);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public static void main(String[] args) {
 
-		AccountRepository accountRepository = (AccountRepository) appContext.getBean("accountRepository");
-		TransactionRepository transactionRepository = (TransactionRepository) appContext.getBean("transactionRepository");
-		AccountManager accountManager = (AccountManager) appContext.getBean("accountManager");
-		StatementManager statementManager = (StatementManager) appContext.getBean("statementManager");
+		SetupUtil su = new SetupUtil();
+		su.setApplicationContext(appContext);
+		try {
+			su.afterPropertiesSet();
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
+//		AccountRepository accountRepository = (AccountRepository) appContext.getBean("accountRepository");
+//		TransactionRepository transactionRepository = (TransactionRepository) appContext.getBean("transactionRepository");
+//		AccountManager accountManager = (AccountManager) appContext.getBean("accountManager");
 		RuleRepository ruleRepository = (RuleRepository) appContext.getBean("ruleRepository");
 
+		RuleParser csvRuleParser = (RuleParser) appContext.getBean("ruleParser");
+		
 		// Load rules
 		Collection<Rule> allRules = null;
 		try {
-			allRules = CSVRuleReader.loadAllRules("rule.csv");
-		} catch (CustomException e1) {
-			e1.printStackTrace();
+			allRules = csvRuleParser.getRules();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// Save new rules
 		allRules.forEach(rule -> {
 			if (!ruleRepository.isRuleExist(rule.getRule())) {
+				logger.info("Saving New Rule :"+rule);
 				ruleRepository.saveRule(rule);
 			}
 		});
+		
+		DefaultEntries de = (DefaultEntries) appContext.getBean("dbGen");
+		de.enter();
 
 		// Get Statements
-
+		StatementEngine se = (StatementEngine) appContext.getBean("statementEngine");
+		List<Statement> allStatements = null;
 		try {
+			allStatements = se.getAllStatements();
+		} catch (CustomException e) {
+			e.printStackTrace();
+		}
+		logger.info("Got Statements");
+
+//		CoreEngine ce = (CoreEngine) appContext.getBean("statementProcessor");
+		InputEngine ce = (InputEngine) appContext.getBean("inputEngine");
+		
+		for(Statement aStmt:allStatements){
+			ce.processStatementFile(aStmt);
+		}
+		
+		
+		
+//		ce.waitToShutdown();
+		
+		/*try {
 			getAllStatements().entrySet().stream().forEach(entry -> {
 				System.out.println("Account :" + entry.getKey() + " - " + entry.getValue());
 				entry.getValue().parallelStream().forEach(stmt -> {
@@ -76,7 +105,7 @@ public class Main {
 		} catch (CustomException e) {
 			logger.error("Exception in getting statement entries : " + e.getMessage());
 		}
-
+*/
 		logger.info("End");
 	}
 
@@ -92,7 +121,7 @@ public class Main {
 		// Create a HashMap for Bank,Statement
 		HashMap<Account, Set<String>> allStatements = new HashMap<Account, Set<String>>();
 		Arrays.asList(rootFolder.listFiles((file) -> {
-			return file.getName().toUpperCase().contains(".XLS");
+			return StringUtils.endsWith(file.getName().toUpperCase(), ".XLS");
 		})).stream().forEach(file -> {
 			Account acc = getAccountFromFileName(file.getName());
 			if (acc != null && allStatements.get(acc) == null) {
@@ -105,7 +134,7 @@ public class Main {
 				logger.warn("File is not matching with any bank code : " + file.getAbsolutePath());
 			}
 		});
-
+		
 		logger.info("Got " + allStatements.size() + " statements to parse.");
 		return allStatements;
 	}

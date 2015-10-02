@@ -2,21 +2,24 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-   http://www.springframework.org/schema/beans/spring-beans.xsd
-   http://www.springframework.org/schema/context
-   http://www.springframework.org/schema/context/spring-context.xsd" 
-	xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:mvc="http://www.springframework.org/schema/mvc">
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- General Property Configuration -->
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>jdbc.properties</value>
+		<property name="locations">
+			<list>
+				<value>jdbc.properties</value>
+				<value>application.properties</value>
+			</list>
 		</property>
 	</bean>
-
+	
 	<!-- Data Source used by Hibernate Session Factory -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -41,7 +44,7 @@
 		</property>
 
 		<!-- Either use packageToScan OR give mapping in XML -->
-		<property name="packagesToScan" value="me.puneetghodasara.txmgr.model" />
+		<property name="packagesToScan" value="me.puneetghodasara.txmgr.core.model.db" />
 		<!-- <property name="configLocation" value="orm.xml" /> -->
 
 	</bean>
@@ -49,7 +52,11 @@
 	<!-- Custom Beans -->
 
 	<context:annotation-config />
+	
+	<task:executor id="executor" pool-size="1" queue-capacity="100" />
+
 	<context:component-scan base-package="me.puneetghodasara" />
+	<task:annotation-driven executor="executor" />
 
 	<!-- We use annotation based scan so no need of XML declaration -->
 	<!-- <bean id="transactionRepository" name="transactionRepository" class="integration.TransactionDAO"> 

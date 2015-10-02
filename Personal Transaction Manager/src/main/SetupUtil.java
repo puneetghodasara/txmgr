@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import me.puneetghodasara.txmgr.model.db.AccountTypeEnum;
-import me.puneetghodasara.txmgr.model.db.BankEnum;
-import me.puneetghodasara.txmgr.provider.TransactionHelper;
+import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
+import me.puneetghodasara.txmgr.core.model.db.BankEnum;
+import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Setup Class that will be called when the bean initializing happens.
@@ -19,14 +22,17 @@ import org.springframework.context.ApplicationContext;
  * @author Punit_Ghodasara
  *
  */
-public class SetupUtil {
+public class SetupUtil implements ApplicationContextAware, InitializingBean {
+
+	// Application Context
+	private ApplicationContext appContext;
 
 	// To store all registered helper bean
 	private static Map<HelperMap, String> helperBeanMap = new HashMap<SetupUtil.HelperMap, String>();
 
 	// To store all properties
 	private static Properties prop = new Properties();
-	
+
 	// Logger
 	private static final Logger logger = Logger.getLogger(SetupUtil.class);
 
@@ -45,8 +51,8 @@ public class SetupUtil {
 		return prop;
 	}
 
-	public static void setup(ApplicationContext appContext) throws Exception {
-
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		Map<String, Object> helperMap = appContext.getBeansWithAnnotation(TransactionHelper.class);
 		for (Object helper : helperMap.values()) {
 			final Class<? extends Object> helperClass = helper.getClass();
@@ -61,10 +67,14 @@ public class SetupUtil {
 		// Get All Properties
 		try (FileInputStream propFile = new FileInputStream(new File("transfer.csv.prop"))) {
 			prop.load(propFile);
-		} catch(Exception e){
+		} catch (Exception e) {
 			// Suppress
 		}
+	}
 
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		appContext = applicationContext;
 	}
 
 	/**
