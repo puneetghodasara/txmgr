@@ -4,14 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.puneetghodasara.txmgr.core.exception.CustomException;
-import me.puneetghodasara.txmgr.core.exception.CustomException.ExceptionType;
-import me.puneetghodasara.txmgr.core.model.db.Statement;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.core.exception.CustomException;
+import me.puneetghodasara.txmgr.core.exception.ExceptionKey;
+import me.puneetghodasara.txmgr.core.model.db.Statement;
 
 @Component(value = "statementEngine")
 public class StatementEngine {
@@ -27,7 +27,7 @@ public class StatementEngine {
 		File rootFolder = new File(rootDirectory);
 		if (!rootFolder.exists()) {
 			logger.error("ROOT Folder is not available.");
-			throw new CustomException(ExceptionType.NO_FOLDER_AVBL);
+			throw CustomException.getCMSException(ExceptionKey.NO_FOLDER_AVBL);
 		}
 
 		List<Statement> stmtList = new ArrayList<Statement>();

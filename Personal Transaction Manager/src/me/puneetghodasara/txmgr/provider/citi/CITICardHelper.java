@@ -1,35 +1,23 @@
 package me.puneetghodasara.txmgr.provider.citi;
 
-import java.io.File;
-import java.io.FileReader;
 import java.util.Date;
-import java.util.List;
 
-import me.puneetghodasara.txmgr.core.manager.AccountManager;
-import me.puneetghodasara.txmgr.core.manager.impl.AccountManagerImpl;
-import me.puneetghodasara.txmgr.core.model.db.Account;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.springframework.stereotype.Component;
+
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBeanFilter;
+import com.opencsv.bean.MappingStrategy;
+
 import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
 import me.puneetghodasara.txmgr.core.model.db.BankEnum;
-import me.puneetghodasara.txmgr.core.model.db.Transaction;
 import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
 import me.puneetghodasara.txmgr.core.parser.CSVRecordParser;
 import me.puneetghodasara.txmgr.core.parser.DateParser;
 import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
-import me.puneetghodasara.txmgr.core.util.ExcelToCSV;
-import me.puneetghodasara.txmgr.core.util.Factory;
-
-import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.springframework.stereotype.Component;
-
-import com.opencsv.CSVReader;
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanFilter;
-import com.opencsv.bean.MappingStrategy;
 
 @Component(value="citiCardHelper")
-@TransactionHelper(accountType=AccountTypeEnum.CREDIT_CARD,bank=BankEnum.CITI_CC_VISA_REWARDS)
+@TransactionHelper(accountType=AccountTypeEnum.CREDIT_CARD,bank=BankEnum.CITI_BANK)
 public class CITICardHelper implements CSVRecordParser, DateParser {
 
 	private static CsvToBeanFilter filter = (String[] line) -> {

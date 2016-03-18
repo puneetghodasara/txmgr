@@ -1,7 +1,5 @@
 package me.puneetghodasara.txmgr.core.model.input;
 
-import me.puneetghodasara.txmgr.core.model.db.Account;
-
 public class GenericStatementEntry {
 
 	public enum FieldMap{

@@ -6,12 +6,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.List;
 
-import me.puneetghodasara.txmgr.core.exception.CustomException.ExceptionType;
-import me.puneetghodasara.txmgr.core.exception.RuleParserException;
-import me.puneetghodasara.txmgr.core.model.db.Rule;
-import me.puneetghodasara.txmgr.core.parser.MyCSVParser;
-import me.puneetghodasara.txmgr.core.parser.RuleParser;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +15,12 @@ import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanFilter;
 import com.opencsv.bean.MappingStrategy;
+
+import me.puneetghodasara.txmgr.core.exception.CustomException;
+import me.puneetghodasara.txmgr.core.exception.ExceptionKey;
+import me.puneetghodasara.txmgr.core.model.db.Rule;
+import me.puneetghodasara.txmgr.core.parser.MyCSVParser;
+import me.puneetghodasara.txmgr.core.parser.RuleParser;
 
 @Component(value="ruleParser")
 public class RuleParserCSV extends MyCSVParser implements RuleParser {
@@ -61,7 +61,7 @@ public class RuleParserCSV extends MyCSVParser implements RuleParser {
 		try {
 			reader = new FileReader(new File(fileName));
 		} catch (FileNotFoundException e) {
-			throw new RuleParserException(ExceptionType.RULE_FILE_NOT_FOUND);
+			throw CustomException.getCMSException(ExceptionKey.RULE_FILE_NOT_FOUND, fileName);
 		}
 
 		// Parsing

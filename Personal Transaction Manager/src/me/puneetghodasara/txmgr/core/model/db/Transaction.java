@@ -13,10 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -25,13 +24,14 @@ import javax.persistence.TemporalType;
  * 
  */
 @Entity
-@NamedQuery(name = "Transaction.findAll", query = "SELECT t FROM Transaction t")
+@NamedQueries(@NamedQuery(name = "Transaction.isSaved", query = "SELECT t FROM Transaction t WHERE t.account.id = :id AND t.amount = :amount  AND t.date = :date "
+		+ " AND t.description = :description "))
 public class Transaction implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Integer id;
 
 	@Column(name = "amount")
@@ -52,8 +52,8 @@ public class Transaction implements Serializable {
 	private Account account;
 
 	// uni-directional one-to-one association to TransactionDetail
-	@OneToOne(cascade=CascadeType.ALL)
-	@JoinColumn(name="detail_id", referencedColumnName="id")
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "detail_id", referencedColumnName = "id")
 	private TransactionDetail transactionDetail;
 
 	public Transaction() {
@@ -117,8 +117,8 @@ public class Transaction implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Transaction [id=" + id + ", amount=" + amount + ", creditDebit=" + creditDebit + ", date=" + date + ", description=" + description
-				+ ", account=" + account + "]";
+		return "Transaction [id=" + id + ", amount=" + amount + ", creditDebit=" + creditDebit + ", date=" + date
+				+ ", description=" + description + ", account=" + account + "]";
 	}
 
 	@Override
@@ -166,9 +166,5 @@ public class Transaction implements Serializable {
 			return false;
 		return true;
 	}
-
-
-
-	
 
 }

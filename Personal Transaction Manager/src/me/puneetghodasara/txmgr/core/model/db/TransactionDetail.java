@@ -2,22 +2,18 @@ package me.puneetghodasara.txmgr.core.model.db;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 /**
  * The persistent class for the transaction_detail database table.
@@ -31,21 +27,16 @@ public class TransactionDetail implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Integer id;
-	
-//	@OneToOne
-//	@PrimaryKeyJoinColumn
-//	private Transaction transaction;
 
-	private String category;
+	@Column(name = "category")
+	@Enumerated(EnumType.STRING)
+	private TransactionCategory category;
 
 	private String tag;
 
 	private String merchant;
-
-	@Column(name = "via_card")
-	private Boolean viaCard;
 
 	private String way;
 
@@ -53,9 +44,9 @@ public class TransactionDetail implements Serializable {
 	private boolean isTransfer = false;
 
 	@OneToOne
-	@JoinColumn(name="target_account", referencedColumnName="id")
+	@JoinColumn(name = "target_account", referencedColumnName = "id")
 	private Account targetAccount;
-	
+
 	public Account getTargetAccount() {
 		return targetAccount;
 	}
@@ -65,14 +56,6 @@ public class TransactionDetail implements Serializable {
 	}
 
 	public TransactionDetail() {
-	}
-
-	public String getCategory() {
-		return this.category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
 	}
 
 	public String getTag() {
@@ -91,12 +74,12 @@ public class TransactionDetail implements Serializable {
 		this.merchant = merchant;
 	}
 
-	public Boolean getViaCard() {
-		return this.viaCard;
+	public TransactionCategory getCategory() {
+		return category;
 	}
 
-	public void setViaCard(Boolean viaCard) {
-		this.viaCard = viaCard;
+	public void setCategory(TransactionCategory category) {
+		this.category = category;
 	}
 
 	public String getWay() {
@@ -117,11 +100,8 @@ public class TransactionDetail implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TransactionDetail [category=" + category + ", tag=" + tag + ", merchant=" + merchant + ", targetAccount=" + targetAccount + "]";
+		return "TransactionDetail [category=" + category + ", tag=" + tag + ", merchant=" + merchant
+				+ ", targetAccount=" + targetAccount + "]";
 	}
 
-
-
-	
-	
 }

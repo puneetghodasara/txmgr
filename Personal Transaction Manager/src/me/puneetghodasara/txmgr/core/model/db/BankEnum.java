@@ -2,14 +2,11 @@ package me.puneetghodasara.txmgr.core.model.db;
 
 public enum BankEnum {
 
-	ICICI_BANK(1,"ICICI Bank Saving Account"),
-	CITI_CC_VISA_REWARDS(2,"Citi Visa Rewards"),
-	CITI_CC_MC_FUEL(3,"Citi Master Card Indian Oil"),
-	CITI_BANK(4,"Citi Bank Saving Account"),
-	UNKNOWN_BANK(6,"Unknown Bank Type"),
-	NO_BANK(5,"--");
+	ICICI_BANK(1,"ICICI Bank"),
+	CITI_BANK(2,"Citi Bank"),
+	NO_BANK(5,"No Bank");
 	
-	public Integer id;
+	private Integer id;
 	private String name;
 	
 	private BankEnum(Integer id, String type) {
@@ -17,12 +14,5 @@ public enum BankEnum {
 		this.name = type;
 	}
 	
-	
-	public Bank getBank(){
-		Bank bank = new Bank();
-		bank.setId(this.id);
-		bank.setBankName(this.name);
-		return bank;
-	}
 	
 }

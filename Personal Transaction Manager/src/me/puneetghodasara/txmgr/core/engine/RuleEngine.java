@@ -2,13 +2,13 @@ package me.puneetghodasara.txmgr.core.engine;
 
 import java.util.List;
 
-import me.puneetghodasara.txmgr.core.integration.RuleRepository;
-import me.puneetghodasara.txmgr.core.model.db.Rule;
-import me.puneetghodasara.txmgr.core.parser.RuleParser;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.core.integration.RuleRepository;
+import me.puneetghodasara.txmgr.core.model.db.Rule;
+import me.puneetghodasara.txmgr.core.parser.RuleParser;
 
 @Component("ruleEngine")
 public class RuleEngine {
@@ -33,12 +33,12 @@ public class RuleEngine {
 
 		// SAVE
 		rules.forEach(rule -> {
-			if (!ruleRepository.isRuleExist(rule.getRule())) {
+			if (!ruleRepository.getRuleByRule(rule.getRule()).findAny().isPresent()) {
 				logger.info("Saving new rule :" + rule);
-				ruleRepository.saveRule(rule);
+				ruleRepository.save(rule);
 			}
 		});
-		
+
 		logger.debug("exiting loadNewRules.");
 		return;
 	}
@@ -58,6 +58,5 @@ public class RuleEngine {
 	public void setRuleRepository(RuleRepository ruleRepository) {
 		this.ruleRepository = ruleRepository;
 	}
-	
-	
+
 }

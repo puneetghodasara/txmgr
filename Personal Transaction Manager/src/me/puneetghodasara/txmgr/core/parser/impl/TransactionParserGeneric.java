@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import main.SetupUtil;
-import me.puneetghodasara.txmgr.core.exception.DuplicateException;
+import me.puneetghodasara.txmgr.config.SetupUtil;
+import me.puneetghodasara.txmgr.core.exception.CustomException;
 import me.puneetghodasara.txmgr.core.integration.RuleRepository;
 import me.puneetghodasara.txmgr.core.manager.AccountManager;
 import me.puneetghodasara.txmgr.core.model.db.Account;
@@ -19,6 +19,7 @@ import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
 import me.puneetghodasara.txmgr.core.model.db.BankEnum;
 import me.puneetghodasara.txmgr.core.model.db.Rule;
 import me.puneetghodasara.txmgr.core.model.db.Transaction;
+import me.puneetghodasara.txmgr.core.model.db.TransactionCategory;
 import me.puneetghodasara.txmgr.core.model.db.TransactionDetail;
 import me.puneetghodasara.txmgr.core.parser.TransactionParser;
 import me.puneetghodasara.txmgr.core.util.UnmatchedTransactionWriter;
@@ -43,7 +44,7 @@ public class TransactionParserGeneric implements TransactionParser {
 
 		Rule matchedRule = null;
 
-		List<Rule> matchedRuleList = ruleRepository.getAllRules().stream().filter(rule -> (StringUtils.containsIgnoreCase(txDesc, rule.getRule())))
+		List<Rule> matchedRuleList = ruleRepository.findAll().stream().filter(rule -> (StringUtils.containsIgnoreCase(txDesc, rule.getRule())))
 				.collect(Collectors.toList());
 
 		if (matchedRuleList.size() == 1) {
@@ -103,7 +104,7 @@ public class TransactionParserGeneric implements TransactionParser {
 			String tagDesc = tagNoGroupNo == null ? "" : customMatcher.group(tagNoGroupNo);
 
 			TransactionDetail txDtl = new TransactionDetail();
-			txDtl.setCategory("Transfer");
+			txDtl.setCategory(TransactionCategory.TRANSFER);
 			txDtl.setMerchant(transaction.getAccount().getName());
 			Account targetAcc = accountManager.getAccountByNumber(accNo);
 			if (targetAcc == null) {
@@ -111,13 +112,12 @@ public class TransactionParserGeneric implements TransactionParser {
 					AccountTypeEnum accType = AccountTypeEnum.valueOf(matchedRule.getMerchant());
 					// Override if null
 					if (accType == null)
-						accType = AccountTypeEnum.BANK_ACCOUNT;
-					targetAcc = accountManager.createAccount("Auto Generated", accNo, BankEnum.UNKNOWN_BANK, accType, "");
-				} catch (DuplicateException e) {
+						accType = AccountTypeEnum.MAIN_ACCOUNT;
+					targetAcc = accountManager.createAccount("Auto Generated", accNo, BankEnum.NO_BANK, accType, "");
+				} catch (CustomException e) {
 				}
 			}
 			txDtl.setTargetAccount(targetAcc);
-			txDtl.setViaCard(false);
 			txDtl.setWay("Electronic");
 			return txDtl;
 		}
@@ -132,7 +132,14 @@ public class TransactionParserGeneric implements TransactionParser {
 
 	private TransactionDetail getTransactionDetail(Rule rule) {
 		TransactionDetail txDetail = new TransactionDetail();
-		txDetail.setCategory(rule.getCategory());
+		TransactionCategory category;
+		try {
+			category = TransactionCategory.valueOf(rule.getCategory());
+		} catch (IllegalArgumentException e) {
+			category = TransactionCategory.UNKNOWN;
+		}
+		
+		txDetail.setCategory(category);
 		txDetail.setMerchant(rule.getMerchant());
 		String targetAccount = rule.getTargetAccount();
 		if (StringUtils.isNotBlank(targetAccount)) {

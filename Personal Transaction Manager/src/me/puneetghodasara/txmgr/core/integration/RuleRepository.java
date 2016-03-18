@@ -1,15 +1,13 @@
 package me.puneetghodasara.txmgr.core.integration;
 
-import java.util.Collection;
+import java.util.stream.Stream;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import me.puneetghodasara.txmgr.core.model.db.Rule;
 
-public interface RuleRepository {
+public interface RuleRepository extends JpaRepository<Rule, Integer> {
 
-	public Collection<Rule> getAllRules();
+	public Stream<Rule> getRuleByRule(String rule);
 
-	public boolean isRuleExist(String rule);
-
-	public void saveRule(Rule rule);
-	
 }

@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.puneetghodasara.txmgr.core.exception.StatementParseException;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.core.exception.CustomException;
 import me.puneetghodasara.txmgr.core.integration.TransactionRepository;
 import me.puneetghodasara.txmgr.core.manager.AccountManager;
 import me.puneetghodasara.txmgr.core.model.db.Account;
@@ -17,10 +21,6 @@ import me.puneetghodasara.txmgr.core.parser.RecordParser;
 import me.puneetghodasara.txmgr.core.parser.StatementParser;
 import me.puneetghodasara.txmgr.core.parser.TransactionParser;
 import me.puneetghodasara.txmgr.core.util.Factory;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component("inputEngine")
 public class InputEngine {
@@ -41,10 +41,10 @@ public class InputEngine {
 	private TransactionRepository transactionRepository;
 
 	public void processStatementFile(Statement stmt) {
-		
+
 		String absoluteFileName = stmt.getFilename();
 		String accountName = stmt.getAccountname();
-		
+
 		logger.debug("Inside processStatementFile with filename " + absoluteFileName);
 
 		// Step 1 : Check
@@ -54,13 +54,12 @@ public class InputEngine {
 			return;
 		}
 
-		
 		Account account = accountManager.getAccountByName(accountName);
 		if (account == null) {
 			logger.error("Account name " + accountName + " is not compatible.");
 			return;
 		}
-		
+
 		// Step 2 : get TransactionHelper of account.
 		RecordParser recordParser = Factory.getRecordParser(account);
 		DateParser dateParser = Factory.getDateParser(account);
@@ -83,10 +82,10 @@ public class InputEngine {
 		statementParser.setDateParser(dateParser);
 		List<Transaction> transactionList = new ArrayList<Transaction>();
 		try {
-			for(GenericStatementEntry stmtEntry : statementEntries){
-				transactionList.add(statementParser.getTransactionEntry(stmtEntry,account));
+			for (GenericStatementEntry stmtEntry : statementEntries) {
+				transactionList.add(statementParser.getTransactionEntry(stmtEntry, account));
 			}
-		} catch (StatementParseException e) {
+		} catch (CustomException e) {
 			logger.error("Error occurred while converting to transactions." + e);
 			return;
 		}
@@ -94,24 +93,25 @@ public class InputEngine {
 		// Step 5 : parse transactions to detail
 		for (Transaction tx : transactionList) {
 			// if it is old, override
-			Integer txId = transactionRepository.isTransactionSaved(tx);
+			Integer txId = transactionRepository.isTransactionSaved(tx.getAccount().getId(), tx.getDescription(),
+					tx.getAmount(), tx.getDate());
 			Transaction originalTx = tx;
-			if(txId != null){
-				originalTx = transactionRepository.getTransactionById(txId);
+			if (txId != null) {
+				originalTx = transactionRepository.getOne(txId);
 			}
-			
+
 			// Parse
 			TransactionDetail transactionDetail = transactionParser.parseTransaction(originalTx);
 			if (transactionDetail == null) {
 				// TODO Unprocessed, like to do anything?
 			}
-			
+
 			// SAVE
-			transactionRepository.saveTransaction(originalTx);
+			transactionRepository.save(originalTx);
 		}
-		
+
 		// Exit
-		
+
 		logger.debug("Filename " + absoluteFileName + " processed.");
 	}
 

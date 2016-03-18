@@ -2,7 +2,6 @@ package me.puneetghodasara.txmgr.core.parser;
 
 import java.util.List;
 
-import me.puneetghodasara.txmgr.core.exception.RuleParserException;
 import me.puneetghodasara.txmgr.core.model.db.Rule;
 
 /**

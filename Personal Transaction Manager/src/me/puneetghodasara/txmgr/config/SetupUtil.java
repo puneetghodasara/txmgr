@@ -1,4 +1,4 @@
-package main;
+package me.puneetghodasara.txmgr.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,15 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
-import me.puneetghodasara.txmgr.core.model.db.BankEnum;
-import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.core.model.db.AccountTypeEnum;
+import me.puneetghodasara.txmgr.core.model.db.BankEnum;
+import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
 
 /**
  * Setup Class that will be called when the bean initializing happens.
@@ -22,6 +23,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author Punit_Ghodasara
  *
  */
+@Component
 public class SetupUtil implements ApplicationContextAware, InitializingBean {
 
 	// Application Context
@@ -57,7 +59,8 @@ public class SetupUtil implements ApplicationContextAware, InitializingBean {
 		for (Object helper : helperMap.values()) {
 			final Class<? extends Object> helperClass = helper.getClass();
 			final TransactionHelper annotation = helperClass.getAnnotation(TransactionHelper.class);
-			logger.info("Found Helper class: " + helperClass + ", for bank: " + annotation.bank() + ", for type: " + annotation.accountType());
+			logger.info("Found Helper class: " + helperClass + ", for bank: " + annotation.bank() + ", for type: "
+					+ annotation.accountType());
 			String[] beanNames = appContext.getBeanNamesForType(helperClass);
 			if (beanNames.length > 0) {
 				helperBeanMap.put(new HelperMap(annotation.accountType(), annotation.bank()), beanNames[0]);

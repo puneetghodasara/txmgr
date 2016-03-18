@@ -1,25 +1,55 @@
 package me.puneetghodasara.txmgr.core.exception;
 
-public class CustomException extends Exception {
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-	public enum ExceptionType {
-		INVALID_STATEMENT_PARSER("No valid statement parser found."), CSV_PARSE_EXCEPTION("CSV parser not found."), INVALID_ENTRY_PARSER(
-				"Entry parser not found."), CREDIT_DEBIT_PARSE_ERROR("Neither Credit nor Debit is a number."), DATE_PARSE_ERROR("Date is not in a valid format."), INVALID_DATE_PARSER("No valid date parser found."), NO_FOLDER_AVBL("NO_FOLDER_AVBL"), RULE_FILE_NOT_FOUND("RULE_FILE_NOT_FOUND");
+/**
+ * Extending a generic {@link WebApplicationException} exception class used for
+ * JAX-RS
+ * 
+ * @author I324801
+ *
+ */
+public class CustomException extends WebApplicationException {
 
-		String msg;
+	private static final long serialVersionUID = 341058583571650888L;
 
-		private ExceptionType(String msg) {
-			this.msg = msg;
-		}
+	@Expose
+	@SerializedName("errorkey")
+	private String errorContract;
+	@Expose
+	@SerializedName("params")
+	private String[] errorParams;
 
+	private CustomException(Status status, String errorContract, String... errorParams) {
+		super(status);
+		this.errorContract = errorContract;
+		this.errorParams = errorParams;
 	}
 
-	public CustomException(ExceptionType type) {
-		super(type.msg);
+	public static CustomException getCMSException(ExceptionKey eKey, String... params) {
+		Status status = Status.NOT_ACCEPTABLE;
+		String errorContract = eKey.name();
+		String[] errorParams = params;
+
+		return new CustomException(status, errorContract, errorParams);
 	}
+
+	public static CustomException getCMSException(Exception dae) {
+		Status status = Status.INTERNAL_SERVER_ERROR;
+
+		return new CustomException(status, ExceptionKey.DB_EXCEPTION.name(), dae.getMessage());
+	}
+
+	public String getErrorContract() {
+		return errorContract;
+	}
+
+	public String[] getErrorParams() {
+		return errorParams;
+	}
+
 }

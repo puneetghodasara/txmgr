@@ -1,20 +1,16 @@
 package me.puneetghodasara.txmgr.core.integration;
 
-import java.util.List;
+import java.util.Date;
 
-import me.puneetghodasara.txmgr.core.model.db.Account;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import me.puneetghodasara.txmgr.core.model.db.Transaction;
 
-public interface TransactionRepository {
+public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
-	public void saveTransaction(Transaction transaction);
-
-	public List<Transaction> getAllTransactionsOfAccount(Account account);
-
-	void deleteTransaction(Transaction transaction);
-
-	Integer isTransactionSaved(Transaction transaction);
-
-	public Transaction getTransactionById(Integer txId);
-	
+	@Query(name = "Transaction.isSaved")
+	Integer isTransactionSaved(@Param("id") Integer accountid, @Param("description") String description,
+			@Param("amount") Double amount, @Param("date") Date date);
 }

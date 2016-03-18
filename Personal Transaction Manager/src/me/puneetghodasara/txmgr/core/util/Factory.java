@@ -1,13 +1,13 @@
 package me.puneetghodasara.txmgr.core.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
 import main.Main;
-import main.SetupUtil;
+import me.puneetghodasara.txmgr.config.SetupUtil;
 import me.puneetghodasara.txmgr.core.model.db.Account;
 import me.puneetghodasara.txmgr.core.parser.DateParser;
 import me.puneetghodasara.txmgr.core.parser.RecordParser;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
 public class Factory {
 
@@ -15,7 +15,7 @@ public class Factory {
 
 	public static RecordParser getRecordParser(Account account) {
 		logger.debug("In statemetn parser factory.");
-		String beanName = SetupUtil.getHelperBeanName(account.getAccountType().getEnumValue(), account.getBank().getEnumValue());
+		String beanName = SetupUtil.getHelperBeanName(account.getAccountType(), account.getBank());
 		if (!StringUtils.isBlank(beanName)) {
 			RecordParser recordParser = (RecordParser) Main.appContext.getBean(beanName);
 			logger.info("Statement parser returned :" + recordParser);
@@ -27,7 +27,7 @@ public class Factory {
 
 	public static DateParser getDateParser(Account account) {
 		logger.debug("In date parser factory.");
-		String beanName = SetupUtil.getHelperBeanName(account.getAccountType().getEnumValue(), account.getBank().getEnumValue());
+		String beanName = SetupUtil.getHelperBeanName(account.getAccountType(), account.getBank());
 		if (!StringUtils.isBlank(beanName)) {
 			DateParser dateParser = (DateParser) Main.appContext.getBean(beanName);
 			logger.info("date parser returned :" + dateParser);

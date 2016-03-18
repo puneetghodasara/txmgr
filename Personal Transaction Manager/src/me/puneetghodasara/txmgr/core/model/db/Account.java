@@ -1,11 +1,21 @@
 package me.puneetghodasara.txmgr.core.model.db;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * The persistent class for the account database table.
@@ -18,22 +28,22 @@ public class Account implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Integer id;
 
 	@Column(name = "name")
 	private String name;
-	
+
 	@Column(name = "account_no")
-	private String accountNumber;
+	private String number;
 
-	@OneToOne
-	@JoinColumn(name = "bank_name")
-	private Bank bank;
+	@Column(name = "bank_name")
+	@Enumerated(EnumType.STRING)
+	private BankEnum bank;
 
-	@OneToOne
-	@JoinColumn(name = "type")
-	private AccountType accountType;
+	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
+	private AccountTypeEnum accountType;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "open_date")
@@ -42,8 +52,7 @@ public class Account implements Serializable {
 	@Column(name = "tag")
 	private String tag;
 
-
-	@OneToMany(mappedBy = "account", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
 	private List<Transaction> transactions;
 
 	public Account() {
@@ -57,11 +66,11 @@ public class Account implements Serializable {
 		this.id = id;
 	}
 
-	public Bank getBank() {
+	public BankEnum getBank() {
 		return this.bank;
 	}
 
-	public void setBank(Bank bank) {
+	public void setBank(BankEnum bank) {
 		this.bank = bank;
 	}
 
@@ -73,12 +82,12 @@ public class Account implements Serializable {
 		this.name = name;
 	}
 
-	public String getAccountNumber() {
-		return accountNumber;
+	public String getNumber() {
+		return number;
 	}
 
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
 	public Date getOpenDate() {
@@ -97,11 +106,11 @@ public class Account implements Serializable {
 		this.tag = tag;
 	}
 
-	public AccountType getAccountType() {
+	public AccountTypeEnum getAccountType() {
 		return this.accountType;
 	}
 
-	public void setAccountType(AccountType accountType) {
+	public void setAccountType(AccountTypeEnum accountType) {
 		this.accountType = accountType;
 	}
 
@@ -129,7 +138,8 @@ public class Account implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Account [id=" + id + ", name=" + name + ", bank=" + bank + ", accountType=" + accountType + ", tag=" + tag + "]";
+		return "Account [id=" + id + ", name=" + name + ", bank=" + bank + ", accountType=" + accountType + ", tag="
+				+ tag + "]";
 	}
 
 	@Override
@@ -157,6 +167,4 @@ public class Account implements Serializable {
 		return true;
 	}
 
-	
-	
 }

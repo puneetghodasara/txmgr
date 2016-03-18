@@ -2,18 +2,17 @@ package me.puneetghodasara.txmgr.core.parser.impl;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
+
 import me.puneetghodasara.txmgr.core.exception.CustomException;
-import me.puneetghodasara.txmgr.core.exception.CustomException.ExceptionType;
-import me.puneetghodasara.txmgr.core.exception.StatementParseException;
+import me.puneetghodasara.txmgr.core.exception.ExceptionKey;
 import me.puneetghodasara.txmgr.core.model.db.Account;
 import me.puneetghodasara.txmgr.core.model.db.CreditDebitEnum;
 import me.puneetghodasara.txmgr.core.model.db.Transaction;
 import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
 import me.puneetghodasara.txmgr.core.parser.DateParser;
 import me.puneetghodasara.txmgr.core.parser.StatementParser;
-
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 @Component(value="statementParser")
 public class StatementParserGeneric implements StatementParser {
@@ -38,7 +37,7 @@ public class StatementParserGeneric implements StatementParser {
 	 * @throws CustomException
 	 */
 	@Override
-	public Transaction getTransactionEntry(GenericStatementEntry statementEntry, Account account) throws StatementParseException {
+	public Transaction getTransactionEntry(GenericStatementEntry statementEntry, Account account) {
 		Transaction tx = new Transaction();
 		tx.setAccount(account);
 		tx.setDescription(statementEntry.getDescription());
@@ -62,7 +61,7 @@ public class StatementParserGeneric implements StatementParser {
 			}
 			if ((crAmount == null && drAmount == null) || (crAmount != null && crAmount.doubleValue() == 0 && drAmount != null && drAmount == 0)) {
 				logger.error("Number Format Exception for :" + credit + " / " + debit);
-				throw new StatementParseException(ExceptionType.CREDIT_DEBIT_PARSE_ERROR);
+				throw CustomException.getCMSException(ExceptionKey.CREDIT_DEBIT_PARSE_ERROR);
 			}
 			if (crAmount == null || crAmount.doubleValue() == 0) {
 				amount = drAmount;
@@ -82,7 +81,7 @@ public class StatementParserGeneric implements StatementParser {
 				creditDebit = amount > 0 ? CreditDebitEnum.DEBIT : CreditDebitEnum.CREDIT;
 			} catch (NumberFormatException nfe) {
 				logger.error("Number Format Exception for :" + absAmount);
-				throw new StatementParseException(ExceptionType.CREDIT_DEBIT_PARSE_ERROR);
+				throw CustomException.getCMSException(ExceptionKey.CREDIT_DEBIT_PARSE_ERROR);
 			}
 		}
 
