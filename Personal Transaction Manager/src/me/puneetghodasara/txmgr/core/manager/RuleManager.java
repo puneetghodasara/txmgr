@@ -10,4 +10,6 @@ public interface RuleManager {
 	public Integer addRule(Rule rule);
 
 	public Long getRuleCount();
+
+	void initializeRules();
 }

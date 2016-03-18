@@ -32,7 +32,7 @@ public class AppConfig extends SpringBootServletInitializer {
 	public RuleListener ruleListener(){
 		return new RuleListener();
 	}
-
+	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(AppConfig.class);

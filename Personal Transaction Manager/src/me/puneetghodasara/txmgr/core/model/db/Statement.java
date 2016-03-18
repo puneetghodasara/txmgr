@@ -8,34 +8,41 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
-import javax.persistence.Transient;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 
 @Entity
-@NamedQuery(name="Statement.findAll", query="SELECT s FROM Statement s")
-public class Statement implements Serializable{
-	
+@NamedQuery(name = "Statement.findAll", query = "SELECT s FROM Statement s")
+public class Statement implements Serializable {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	private Integer id;
 
-	@Column
-	private String accountname;
-	
-	@Column
-	private String bankname;
-	
-	@Column
-	private String accounttype;
+	@OneToOne
+	@JoinColumn
+	private Account account;
 
 	@Column
 	private String filename;
-	
-	@Transient
-	private Date readDate;
-	
+
+	@Column
+	private Date uploadDate;
+
+	@Column
+	private Date processDate;
+
+	@Column(length = 1024 * 1024)
+	private byte[] content;
+
+	@PrePersist
+	private void setReadDate() {
+		uploadDate = new Date();
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	public Integer getId() {
@@ -46,20 +53,12 @@ public class Statement implements Serializable{
 		this.id = id;
 	}
 
-	public String getAccountname() {
-		return accountname;
+	public Account getAccount() {
+		return account;
 	}
 
-	public void setAccountname(String accountname) {
-		this.accountname = accountname;
-	}
-
-	public String getAccounttype() {
-		return accounttype;
-	}
-
-	public void setAccounttype(String accounttype) {
-		this.accounttype = accounttype;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 	public String getFilename() {
@@ -71,25 +70,37 @@ public class Statement implements Serializable{
 	}
 
 	public Date getReadDate() {
-		return readDate;
+		return uploadDate;
 	}
 
 	public void setReadDate(Date readDate) {
-		this.readDate = readDate;
+		this.uploadDate = readDate;
 	}
 
-	public String getBankname() {
-		return bankname;
+	public Date getProcessDate() {
+		return processDate;
 	}
 
-	public void setBankname(String bankname) {
-		this.bankname = bankname;
+	public void setProcessDate() {
+		this.processDate = new Date();
+	}
+
+	public Date getUploadDate() {
+		return uploadDate;
+	}
+
+	public byte[] getContent() {
+		return content;
+	}
+
+	public void setContent(byte[] content) {
+		this.content = content;
 	}
 
 	@Override
 	public String toString() {
-		return "Statement [accountname=" + accountname + ", accounttype=" + accounttype + ", filename=" + filename + "]";
+		return "Statement [id=" + id + ", account=" + account.getName() + ", filename=" + filename + ", readDate="
+				+ uploadDate + "]";
 	}
 
-	
 }

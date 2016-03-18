@@ -18,7 +18,7 @@ public class DefaultEntries implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		try {
-			accountManager.createAccount("CITI-4386", "xxxx-4386", BankEnum.CITI_BANK, AccountTypeEnum.CREDIT_CARD,
+			accountManager.createAccount("CITI-4386", "xxxx-4386", BankEnum.CITI_BANK, AccountTypeEnum.MAIN_ACCOUNT,
 					"Dell Visa Rewards Credit Card");
 		} catch (CustomException e) {
 			e.printStackTrace();

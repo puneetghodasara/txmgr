@@ -1,17 +1,16 @@
-package me.puneetghodasara.txmgr.core.engine;
+package me.puneetghodasara.txmgr.core.processor;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import me.puneetghodasara.txmgr.core.model.db.Statement;
-import me.puneetghodasara.txmgr.core.util.ExcelToCSV;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+
+import me.puneetghodasara.txmgr.core.model.db.Statement;
+import me.puneetghodasara.txmgr.core.util.ExcelToCSV;
 
 //@Component("statementProcessor")
 public class CoreEngine {
@@ -28,7 +27,7 @@ public class CoreEngine {
 	private static ExecutorService convertService = Executors.newFixedThreadPool(CONVERT_THREAD_CNT);
 
 	@Autowired
-	private InputEngine inputEngine;
+	private StatementProcessor inputEngine;
 
 	public synchronized void processStatement(Statement stmt) {
 		service.submit(() -> {
@@ -41,7 +40,7 @@ public class CoreEngine {
 				e.printStackTrace();
 				return ;
 			}
-			inputEngine.processStatementFile(stmt);
+//			inputEngine.processStatementFile(stmt);
 		});
 	}
 
@@ -95,11 +94,11 @@ public class CoreEngine {
 		logger.info("Exiting waitToShutdown.");
 	}
 
-	public InputEngine getInputEngine() {
+	public StatementProcessor getInputEngine() {
 		return inputEngine;
 	}
 
-	public void setInputEngine(InputEngine inputEngine) {
+	public void setInputEngine(StatementProcessor inputEngine) {
 		this.inputEngine = inputEngine;
 	}
 

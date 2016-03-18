@@ -27,7 +27,7 @@ import me.puneetghodasara.txmgr.core.provider.TransactionHelper;
 public class SetupUtil implements ApplicationContextAware, InitializingBean {
 
 	// Application Context
-	private ApplicationContext appContext;
+	private static ApplicationContext appContext;
 
 	// To store all registered helper bean
 	private static Map<HelperMap, String> helperBeanMap = new HashMap<SetupUtil.HelperMap, String>();
@@ -73,6 +73,10 @@ public class SetupUtil implements ApplicationContextAware, InitializingBean {
 		} catch (Exception e) {
 			// Suppress
 		}
+	}
+	
+	public static ApplicationContext getAppContext() {
+		return appContext;
 	}
 
 	@Override

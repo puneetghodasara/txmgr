@@ -1,6 +1,5 @@
-package me.puneetghodasara.txmgr.core.engine;
+package me.puneetghodasara.txmgr.core.processor;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import me.puneetghodasara.txmgr.core.exception.CustomException;
 import me.puneetghodasara.txmgr.core.integration.TransactionRepository;
-import me.puneetghodasara.txmgr.core.manager.AccountManager;
 import me.puneetghodasara.txmgr.core.model.db.Account;
 import me.puneetghodasara.txmgr.core.model.db.Statement;
 import me.puneetghodasara.txmgr.core.model.db.Transaction;
@@ -22,14 +20,11 @@ import me.puneetghodasara.txmgr.core.parser.StatementParser;
 import me.puneetghodasara.txmgr.core.parser.TransactionParser;
 import me.puneetghodasara.txmgr.core.util.Factory;
 
-@Component("inputEngine")
-public class InputEngine {
+@Component("statementProcessor")
+public class StatementProcessor implements Runnable{
 
 	// Logger
-	private static final Logger logger = Logger.getLogger(InputEngine.class);
-
-	@Autowired
-	private AccountManager accountManager;
+	private static final Logger logger = Logger.getLogger(StatementProcessor.class);
 
 	@Autowired
 	private StatementParser statementParser;
@@ -40,23 +35,22 @@ public class InputEngine {
 	@Autowired
 	private TransactionRepository transactionRepository;
 
-	public void processStatementFile(Statement stmt) {
+	private Statement statement;
+	
+	public void setStatement(Statement statement) {
+		this.statement = statement;
+	}
 
-		String absoluteFileName = stmt.getFilename();
-		String accountName = stmt.getAccountname();
+	private void processStatementFile() {
+
+		String absoluteFileName = statement.getFilename();
+		Account account = statement.getAccount();
 
 		logger.debug("Inside processStatementFile with filename " + absoluteFileName);
 
 		// Step 1 : Check
-		File statementFile = new File(absoluteFileName);
-		if (!statementFile.exists()) {
-			logger.error("File " + absoluteFileName + " not found.");
-			return;
-		}
-
-		Account account = accountManager.getAccountByName(accountName);
 		if (account == null) {
-			logger.error("Account name " + accountName + " is not compatible.");
+			logger.error("Account " + account + " is not compatible.");
 			return;
 		}
 
@@ -65,14 +59,14 @@ public class InputEngine {
 		DateParser dateParser = Factory.getDateParser(account);
 
 		if (recordParser == null || dateParser == null) {
-			logger.error("Helper class for account " + accountName + " is not registered.");
+			logger.error("Helper class for account " + account + " is not registered.");
 			return;
 		}
 
 		// Step 3 : parse to generic statement entries
 		List<GenericStatementEntry> statementEntries;
 		try {
-			statementEntries = recordParser.parseStatementFile(statementFile.getAbsolutePath());
+			statementEntries = recordParser.parseStatementFile(statement.getContent());
 		} catch (Exception e) {
 			logger.error("Error occurred while parsing statement file." + e);
 			return;
@@ -83,7 +77,8 @@ public class InputEngine {
 		List<Transaction> transactionList = new ArrayList<Transaction>();
 		try {
 			for (GenericStatementEntry stmtEntry : statementEntries) {
-				transactionList.add(statementParser.getTransactionEntry(stmtEntry, account));
+				Transaction transactionEntry = statementParser.getTransactionEntry(stmtEntry, account);
+				transactionList.add(transactionEntry);
 			}
 		} catch (CustomException e) {
 			logger.error("Error occurred while converting to transactions." + e);
@@ -113,6 +108,12 @@ public class InputEngine {
 		// Exit
 
 		logger.debug("Filename " + absoluteFileName + " processed.");
+	}
+
+	@Override
+	public void run() {
+		if(statement != null)
+			processStatementFile();
 	}
 
 }

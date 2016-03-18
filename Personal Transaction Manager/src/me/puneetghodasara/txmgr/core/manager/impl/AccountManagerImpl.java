@@ -29,7 +29,7 @@ public class AccountManagerImpl implements AccountManager {
 			throws CustomException {
 
 		// Check
-		if (getAccountByName(name) != null)
+		if (getAccountByNumber(number) != null)
 			throw CustomException.getCMSException(ExceptionKey.DUPLICATE_ACCOUNT_NAME, name);
 
 		// Make an Account
@@ -74,9 +74,8 @@ public class AccountManagerImpl implements AccountManager {
 	}
 
 	@Override
-	public Account getAccountById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Account getAccountById(Integer id) {
+		return accountRepository.findOne(id);
 	}
 
 	public AccountRepository getAccountRepository() {

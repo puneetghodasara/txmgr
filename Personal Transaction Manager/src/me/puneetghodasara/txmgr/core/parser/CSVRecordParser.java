@@ -1,10 +1,9 @@
 package me.puneetghodasara.txmgr.core.parser;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.List;
-
-import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +11,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanFilter;
 import com.opencsv.bean.MappingStrategy;
+
+import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
 
 public interface CSVRecordParser extends RecordParser {
 
@@ -21,7 +22,7 @@ public interface CSVRecordParser extends RecordParser {
 
 	public MappingStrategy<GenericStatementEntry> getCsvMappingStrategy();
 
-	public default List<GenericStatementEntry> parseStatementFile(String csvFile) throws Exception {
+	public default List<GenericStatementEntry> parseStatementFile(byte[] csvFile) throws Exception {
 		List<GenericStatementEntry> statementEntryList = null;
 
 		CSVReader csvReader;
@@ -42,10 +43,15 @@ public interface CSVRecordParser extends RecordParser {
 		return statementEntryList;
 	}
 
-	public default CSVReader getCSVReader(String csvFile) throws FileNotFoundException {
-		return new CSVReader(new FileReader(csvFile), ',', '\"');
-	}
+//	public default CSVReader getCSVReader(String csvFile) throws FileNotFoundException {
+//		return new CSVReader(new FileReader(csvFile), ',', '\"');
+//	}
 
+	
+	public default CSVReader getCSVReader(byte[] csvFile) throws FileNotFoundException {
+		return new CSVReader(new InputStreamReader(new ByteArrayInputStream(csvFile)), ',', '\"');
+	}
+	
 	public default CsvToBean getCSVToBean() {
 		return new CsvToBean();
 	}

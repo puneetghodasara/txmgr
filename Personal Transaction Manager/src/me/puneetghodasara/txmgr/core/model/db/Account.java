@@ -2,9 +2,7 @@ package me.puneetghodasara.txmgr.core.model.db;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -52,11 +49,9 @@ public class Account implements Serializable {
 	@Column(name = "tag")
 	private String tag;
 
-	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-	private List<Transaction> transactions;
+//	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+//	private List<Transaction> transactions = new ArrayList<>();
 
-	public Account() {
-	}
 
 	public Integer getId() {
 		return this.id;
@@ -114,27 +109,6 @@ public class Account implements Serializable {
 		this.accountType = accountType;
 	}
 
-	public List<Transaction> getTransactions() {
-		return this.transactions;
-	}
-
-	public void setTransactions(List<Transaction> transactions) {
-		this.transactions = transactions;
-	}
-
-	public Transaction addTransaction(Transaction transaction) {
-		getTransactions().add(transaction);
-		transaction.setAccount(this);
-
-		return transaction;
-	}
-
-	public Transaction removeTransaction(Transaction transaction) {
-		getTransactions().remove(transaction);
-		transaction.setAccount(null);
-
-		return transaction;
-	}
 
 	@Override
 	public String toString() {

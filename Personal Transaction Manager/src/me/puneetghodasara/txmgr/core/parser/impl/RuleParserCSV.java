@@ -22,7 +22,7 @@ import me.puneetghodasara.txmgr.core.model.db.Rule;
 import me.puneetghodasara.txmgr.core.parser.MyCSVParser;
 import me.puneetghodasara.txmgr.core.parser.RuleParser;
 
-@Component(value="ruleParser")
+@Component(value = "ruleParser")
 public class RuleParserCSV extends MyCSVParser implements RuleParser {
 
 	// Logger
@@ -33,22 +33,26 @@ public class RuleParserCSV extends MyCSVParser implements RuleParser {
 	private String fileName;
 
 	// CSV To Bean
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private CsvToBean<Rule> csvToBean;
 
 	public RuleParserCSV() {
 		super();
 	}
 
+	private static CsvToBeanFilter filter = (String[] line) -> {
+		return !(line[0].indexOf('#') != -1);
+	};
+
 	@Override
 	public CsvToBeanFilter getCsvToBeanFilter() {
-		return null;
+		return filter;
 	}
 
 	@Override
 	public MappingStrategy<Rule> getCsvMappingStrategy() {
 		ColumnPositionMappingStrategy<Rule> mapper = new ColumnPositionMappingStrategy<Rule>();
-		mapper.setColumnMapping("rule", "category", "merchant", "targetAccount", "propRef");
+		mapper.setColumnMapping("rule", "category", "isTransfer" ,"merchant", "targetAccType", "propRef");
 		mapper.setType(Rule.class);
 		return mapper;
 	}
@@ -67,9 +71,9 @@ public class RuleParserCSV extends MyCSVParser implements RuleParser {
 		// Parsing
 		List<Rule> ruleList;
 		try {
-			ruleList = getCsvToBean().parse(getCsvMappingStrategy(), reader);
+			ruleList = getCsvToBean().parse(getCsvMappingStrategy(), reader, getCsvToBeanFilter());
 		} catch (Exception e) {
-			logger.error("Error while parsing rule file."+e);
+			logger.error("Error while parsing rule file." + e);
 			throw e;
 		}
 
@@ -78,7 +82,7 @@ public class RuleParserCSV extends MyCSVParser implements RuleParser {
 	}
 
 	public CsvToBean<Rule> getCsvToBean() {
-		if(csvToBean == null){
+		if (csvToBean == null) {
 			setCsvToBean(null);
 		}
 		return csvToBean;
@@ -87,5 +91,5 @@ public class RuleParserCSV extends MyCSVParser implements RuleParser {
 	public void setCsvToBean(CsvToBean<Rule> csvToBean) {
 		this.csvToBean = new CsvToBean<Rule>();
 	}
-	
+
 }

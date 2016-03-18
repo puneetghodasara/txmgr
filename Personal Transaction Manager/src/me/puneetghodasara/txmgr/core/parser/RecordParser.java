@@ -14,5 +14,5 @@ import me.puneetghodasara.txmgr.core.model.input.GenericStatementEntry;
  */
 public interface RecordParser {
 
-	public List<GenericStatementEntry> parseStatementFile(String stmtFile) throws Exception;
+	public List<GenericStatementEntry> parseStatementFile(byte[] stmtFile) throws Exception;
 }

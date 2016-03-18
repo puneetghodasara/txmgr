@@ -13,7 +13,7 @@ public interface AccountManager {
 
 	public Account getAccountByNumber(String number);
 
-	public Account getAccountById(String id);
+	public Account getAccountById(Integer id);
 
 	public Account createAccount(String name, String number, BankEnum bank, AccountTypeEnum accType, String tag)
 			throws CustomException;
@@ -21,5 +21,6 @@ public interface AccountManager {
 	public void deleteAccount(Account citiCardAcc);
 
 	public List<Account> getAllAccounts();
+
 
 }

@@ -50,6 +50,12 @@
 			<version>${spring.boot.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-multipart</artifactId>
+			<version>2.22.1</version>
+		</dependency>
+
 
 		<!-- For Hibernate Framework -->
 		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-core</artifactId> 
@@ -59,6 +65,18 @@
 		<!-- <dependency> <groupId>org.javassist</groupId> <artifactId>javassist</artifactId> 
 			<version>3.18.1-GA</version> </dependency> -->
 
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		
 		<!-- Data Source Binding -->
 		<dependency>
 			<groupId>commons-dbcp</groupId>
