@@ -23,7 +23,7 @@ public class TransactionParserGeneric implements TransactionParser {
 
 	@Override
 	public TransactionDetail parseTransaction(Transaction transaction) {
-		logger.debug("Parsing Transaction " + transaction);
+		logger.info("Parsing Transaction " + transaction);
 
 		Rule matchedRule = transactionProcessor.getMatchingRule(transaction);
 

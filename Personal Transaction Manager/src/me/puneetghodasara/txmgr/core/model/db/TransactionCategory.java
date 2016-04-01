@@ -7,10 +7,16 @@ public enum TransactionCategory {
 	/* Expense Types */
 	FOOD,
 	GROCERY,
+	MEDICINE,
 	TRAVELLING,
 	RECHARGE,
+	SHOPPING,
 	CHARGES,
 	MISC,
+	BROADBAND,
+	FUEL_SERVICE,
+	RENT_BROKERAGE,
+	GROOMING,
 
 	/* Transfer Internal */
 	DEPOSIT,
@@ -21,5 +27,6 @@ public enum TransactionCategory {
 	ELECTRONIC,
 	BILL_PAY,
 	SALARY,
+	INVEST
 
 }

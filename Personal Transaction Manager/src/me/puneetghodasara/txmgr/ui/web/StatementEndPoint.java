@@ -1,7 +1,10 @@
 package me.puneetghodasara.txmgr.ui.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -11,7 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.core.task.TaskExecutor;
@@ -24,6 +27,7 @@ import me.puneetghodasara.txmgr.core.manager.StatementManager;
 import me.puneetghodasara.txmgr.core.model.db.Account;
 import me.puneetghodasara.txmgr.core.model.db.Statement;
 import me.puneetghodasara.txmgr.core.processor.StatementProcessor;
+import me.puneetghodasara.txmgr.core.util.ExcelToCSV;
 
 @Component
 @Transactional
@@ -63,7 +67,8 @@ public class StatementEndPoint {
 		byte[] content;
 		try {
 			// TODO encrypt and then store ;-)
-			content = IOUtils.toByteArray(fileStream);
+			content = convertFile(fileStream, fileName);
+//			content = IOUtils.toByteArray(fileStream);
 		} catch (IOException e) {
 			throw CustomException.getCMSException(e);
 		}
@@ -82,6 +87,27 @@ public class StatementEndPoint {
 		executor.execute(statementProcessor);
 
 		return -1L;
+	}
+
+	
+	private byte[] convertFile(InputStream fileStream, String name) throws IOException {
+
+		String fileName = name;
+
+		byte[] content;
+			// TODO encrypt and then store ;-)
+			
+			File tempFile = File.createTempFile("PTM-I", fileName.substring(0, 1));
+			Files.copy(fileStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			
+			File tempOutFile = File.createTempFile("PTM-O", fileName.substring(0, 1));
+			
+			ExcelToCSV.convertToXls(tempFile, tempOutFile);
+			
+			content = FileUtils.readFileToByteArray(tempOutFile);
+//			content = IOUtils.toByteArray(fileStream);
+
+		return content;
 	}
 
 }

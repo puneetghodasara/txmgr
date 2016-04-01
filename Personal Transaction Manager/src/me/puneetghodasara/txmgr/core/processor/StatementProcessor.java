@@ -88,21 +88,19 @@ public class StatementProcessor implements Runnable{
 		// Step 5 : parse transactions to detail
 		for (Transaction tx : transactionList) {
 			// if it is old, override
-			Integer txId = transactionRepository.isTransactionSaved(tx.getAccount().getId(), tx.getDescription(),
+			Transaction originalTx = transactionRepository.isTransactionSaved(tx.getAccount().getId(), tx.getDescription(),
 					tx.getAmount(), tx.getDate());
-			Transaction originalTx = tx;
-			if (txId != null) {
-				originalTx = transactionRepository.getOne(txId);
-			}
 
 			// Parse
-			TransactionDetail transactionDetail = transactionParser.parseTransaction(originalTx);
-			if (transactionDetail == null) {
-				// TODO Unprocessed, like to do anything?
+			TransactionDetail transactionDetail = null;
+			if(originalTx != null){
+				transactionDetail = transactionParser.parseTransaction(originalTx);
+				transactionRepository.save(originalTx);
+			} else{
+				transactionDetail = transactionParser.parseTransaction(tx);
+				transactionRepository.save(tx);
 			}
 
-			// SAVE
-			transactionRepository.save(originalTx);
 		}
 
 		// Exit

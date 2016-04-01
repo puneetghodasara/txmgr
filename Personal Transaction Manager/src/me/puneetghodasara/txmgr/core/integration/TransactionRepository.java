@@ -11,6 +11,6 @@ import me.puneetghodasara.txmgr.core.model.db.Transaction;
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
 	@Query(name = "Transaction.isSaved")
-	Integer isTransactionSaved(@Param("id") Integer accountid, @Param("description") String description,
+	Transaction isTransactionSaved(@Param("id") Integer accountid, @Param("description") String description,
 			@Param("amount") Double amount, @Param("date") Date date);
 }
