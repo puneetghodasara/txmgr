@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd 
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd 
+	http://www.springframework.org/schema/data/jpa 
+	http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+	<!-- General Property Configuration -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>jdbc.properties</value>
+				<value>application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Data Source used by Hibernate Session Factory 
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean> -->
+
+	<!-- For consider the using of annotations foe defining Spring Bean -->
+	<context:annotation-config />
+
+	<!-- For defining Spring Bean -->
+	<context:component-scan base-package="me.puneetghodasara.txmgr" />
+
+	<!-- For bootstrapping the Spring Repository -->
+	<jpa:repositories base-package="me.puneetghodasara.txmgr" />
+
+	<!-- Necessary to get the entity manager injected into the factory bean -->
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+
+	<!-- JPA (EclipseLink) Related Beans End -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="me.puneetghodasara.txmgr" />
+
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+		<property name="jpaPropertyMap">
+			<map>
+				<entry key="eclipselink.weaving" value="false" />
+				<entry key="eclipselink.ddl-generation" value="create-tables" />
+				<!-- <entry key="eclipselink.ddl-generation" value="drop-and-create-tables" 
+					/> -->
+				<entry key="eclipselink.ddl-generation.output-mode" value="both" />
+				<entry key="eclipselink.deploy-on-startup" value="true" />
+				<entry key="eclipselink.logging.level" value="FINEST" />
+
+				<entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+				<entry key="hibernate.hbm2ddl.auto" value="create-drop" />
+				<!-- <entry key="hibernate.multiTenancy" value="DISCRIMINATOR" /> <entry 
+					key="hibernate.multi_tenant_connection_provider" value="" /> <entry key="hibernate.tenant_identifier_resolver" 
+					value="com.sap.iot.cms.configuration.business.HTenantResolver" /> -->
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hibernateJpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="databasePlatform"
+			value="org.eclipse.persistence.platform.database.HSQLPlatform" />
+		<property name="generateDdl" value="true" />
+		<property name="showSql" value="false" />
+	</bean>
+	<!-- <bean id="eclipseLinkJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"> 
+		<property name="databasePlatform" value="org.eclipse.persistence.platform.database.HSQLPlatform" 
+		/> <property name="generateDdl" value="true" /> <property name="showSql" 
+		value="true" /> </bean> -->
+	<!-- JPA (EclipseLink) Related Beans End -->
+
+
+	<!-- Enable Transactional Manner -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> 
+		<property name="entityManagerFactory" ref="entityManagerFactory" /> </bean>
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+
+	<task:executor id="executor" pool-size="1"
+		queue-capacity="100" ></task:executor>
+	<task:annotation-driven executor="executor" ></task:annotation-driven>
+
+</beans>
